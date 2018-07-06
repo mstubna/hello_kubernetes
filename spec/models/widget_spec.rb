@@ -8,6 +8,7 @@ RSpec.describe Widget, type: :model do
   end
 
   describe 'validations' do
+    subject { FactoryBot.create(:widget) }
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_uniqueness_of(:name) }
   end
