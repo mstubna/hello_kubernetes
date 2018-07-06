@@ -41,7 +41,7 @@ jobs:
       - run:
           name: install ruby dependencies
           command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
+            bin/bundle install --jobs=4 --retry=3 --path vendor/bundle
 
       - save_cache:
           paths:
@@ -49,18 +49,13 @@ jobs:
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
 
 
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
-            - v1-dependencies-
-
       # Database setup
       - run:
           name: set up DB
           command: |
-            bundle exec rake db:create
-            bundle exec rake db:schema:load
-            bundle exec rake db:seed
+            bin/bundle exec rake db:create
+            bin/bundle exec rake db:schema:load
+            bin/bundle exec rake db:seed
           environment:
             DATABASE_URL: postgres://ubuntu@localhost:5432/hello_kubernetes_test
 
@@ -68,7 +63,7 @@ jobs:
       - run:
           name: run rubocop
           command: |
-            bundle exec rubocop
+            bin/bundle exec rubocop
 
       # run ruby tests
       - run:
@@ -76,7 +71,7 @@ jobs:
           command: |
             mkdir /tmp/test-results
 
-            bundle exec rspec --format progress \
+            bin/bundle exec rspec --format progress \
                             --format RspecJunitFormatter \
                             --out /tmp/test-results/rspec.xml \
                             --format progress

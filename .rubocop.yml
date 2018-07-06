@@ -4,7 +4,7 @@ AllCops:
     - node_modules/**/*
     - vendor/**/*
     - bin/**/*
-  TargetRubyVersion: 2.5.0
+  TargetRubyVersion: 2.5.1
 
 Style/StringLiterals:
   Enabled: true
