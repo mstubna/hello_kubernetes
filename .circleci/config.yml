@@ -80,7 +80,7 @@ jobs:
       - run: echo ${GOOGLE_AUTH} > ${HOME}/gcp-key.json
       - run: sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update kubectl
       - run: /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
-      - run: /opt/google-cloud-sdk/bin/gcloud container builds submit . --config cloudbuild.yaml --substitutions=_COMMIT_SHA=$COMMIT_SHA,_GC_IMAGE=$GC_IMAGE --project=$GC_PROJECT
+      - run: /opt/google-cloud-sdk/bin/gcloud container builds submit . --config cloudbuild.yaml --substitutions=COMMIT_SHA=${COMMIT_SHA},_GC_IMAGE=$GC_IMAGE --project=$GC_PROJECT
       - run: /opt/google-cloud-sdk/bin/gcloud config set project $GC_PROJECT
       - run: /opt/google-cloud-sdk/bin/gcloud config set compute/zone $GC_ZONE
       - run: /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials $GC_CLUSTER
