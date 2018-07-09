@@ -1,15 +1,15 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: captioned-images-db-migrate
+  name: hello-kubernetes-db-migrate
 spec:
   completions: 1
   template:
     metadata:
-      name: captioned-images-db-migrate
+      name: hello-kubernete-db-migrate
     spec:
       containers:
-      - name: captioned-images-migrate
+      - name: hello-kubernetes-migrate
         image: us.gcr.io/${PROJECT_ID}/hello-kubernetes:${COMMIT_SHA}
         imagePullPolicy: Always
         args: ["bundle", "exec", "rake", "db:create", "db:migrate"]
@@ -29,7 +29,7 @@ spec:
         - name: DB_PORT
           value: "3306"
         - name: DB_DBNAME
-          value: "captioned_images"
+          value: "hello_kubernetes_production"
         - name: SECRET_KEY_BASE
           value: "88d24294e8de572f8526f0f0fcc51c0a857b58aee01182303c8bed8fae8646831a350f323e1d090c43055e6466275500006bc312ea0ab287cc0cb611619666fb"
       - name: cloudsql-proxy
@@ -41,8 +41,6 @@ spec:
           - name: cloudsql-instance-credentials
             mountPath: /secrets/cloudsql
             readOnly: true
-          - name: ssl-certs
-            mountPath: /etc/ssl/certs
           - name: cloudsql
             mountPath: /cloudsql
       volumes:
@@ -51,7 +49,4 @@ spec:
           secretName: cloudsql-instance-credentials
       - name: cloudsql
         emptyDir:
-      - name: ssl-certs
-        hostPath:
-          path: /etc/ssl/certs
       restartPolicy: Never
