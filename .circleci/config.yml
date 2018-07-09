@@ -82,22 +82,21 @@ jobs:
       - run:
           name: submit build to Google Cloud Platform
           command: |
+            export COMMIT_SHA=$(git rev-parse --verify HEAD)
             echo ${GOOGLE_AUTH} > ${HOME}/gcp-key.json
             sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update kubectl
+            sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
             /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
-            /opt/google-cloud-sdk/bin/gcloud container builds submit --config cloudbuild.yaml --project=$GC_PROJECT --substitutions=_GC_IMAGE=$GC_IMAGE,COMMIT_SHA=$COMMIT_SHA .
-          environment:
-            COMMIT_SHA: $(git rev-parse --verify HEAD)
+            /opt/google-cloud-sdk/bin/gcloud container builds submit . --config cloudbuild.yaml --substitutions=_GC_IMAGE=$GC_IMAGE,COMMIT_SHA=$COMMIT_SHA --project=$GC_PROJECT
 
       - run:
           name: trigger deploy
           command: |
+            export COMMIT_SHA=$(git rev-parse --verify HEAD)
             /opt/google-cloud-sdk/bin/gcloud config set project $GC_PROJECT
             /opt/google-cloud-sdk/bin/gcloud config set compute/zone $GC_ZONE
             /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials $GC_CLUSTER
             kubectl set image deployment hello-kubernetes hello-kubernetes=gcr.io/$GC_PROJECT/$GC_IMAGE:$COMMIT_SHA --record
-          environment:
-            COMMIT_SHA: $(git rev-parse --verify HEAD)
 
 workflows:
   version: 2
