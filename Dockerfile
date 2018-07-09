@@ -22,11 +22,7 @@ RUN bundle install --deployment && rbenv rehash
 ENV RACK_ENV=production \
     RAILS_ENV=production \
     RAILS_SERVE_STATIC_FILES=true \
-    HELLO_KUBERNETES_DATABASE=hello_kubernetes_production \
-    HELLO_KUBERNETES_DATABASE_USERNAME=posgres \
-    HELLO_KUBERNETES_DATABASE_PASSWORD=BDvteGK7gu429t1E \
-    HELLO_KUBERNETES_CONNECTION=/cloudsql/hello-kubernetes-209412:us-east1:hello-kubernetes
-
+    SECRET_KEY_BASE=$SECRET_KEY_BASE
 
 # Install yarn
 RUN npm i -g yarn
