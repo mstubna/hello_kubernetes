@@ -77,11 +77,11 @@ jobs:
     steps:
       - checkout
       - run: export COMMIT_SHA=$(git rev-parse --verify HEAD)
-      - run: sudo gcloud --quiet components update kubectl
+      - run: sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update kubectl
       - run: echo ${GOOGLE_AUTH} > ${HOME}/gcp-key.json
-      - run: gcloud config set project $PROJECT_ID
-      - run: gcloud config set compute/zone $GC_ZONE
-      - run: gcloud container clusters get-credentials $GC_CLUSTER
+      - run: /opt/google-cloud-sdk/bin/gcloud config set project $PROJECT_ID
+      - run: /opt/google-cloud-sdk/bin/gcloud config set compute/zone $GC_ZONE
+      - run: /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials $GC_CLUSTER
       - run: /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
       - run: /opt/google-cloud-sdk/bin/gcloud container builds submit . --config cloudbuild.yaml --substitutions=COMMIT_SHA=$COMMIT_SHA --project=$GC_PROJECT
       - run: kubectl set image deployment hello-kubernetes hello-kubernetes=gcr.io/$PROJECT/$GC_IMAGE:$COMMIT_SHA --record
