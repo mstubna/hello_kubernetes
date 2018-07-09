@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: hello-kubernetes
-        image: us.gcr.io/${PROJECT_ID}/hello-kubernetes:${COMMIT_SHA}
+        image: gcr.io/${PROJECT_ID}/hello-kubernetes:${COMMIT_SHA}
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

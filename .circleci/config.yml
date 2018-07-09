@@ -70,3 +70,24 @@ jobs:
           name: run tests
           command: |
             bin/bundle exec rspec
+
+  deploy:
+    machine: true
+    steps:
+      - checkout
+      - run: echo ${GOOGLE_AUTH} > ${HOME}/gcp-key.json
+      - run: gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
+      - run: gcloud container builds submit --config cloudbuild.yaml --substitutions=COMMIT_SHA=$CIRCLE_SHA1
+      - run: kubectl set image deployment ${IMAGE_NAME} ${IMAGE_NAME}=${IMAGE_NAME}:$CIRCLE_SHA1 --record
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
