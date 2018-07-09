@@ -72,15 +72,14 @@ jobs:
             bin/bundle exec rspec
 
   deploy:
-    docker:
-      - image: circleci/ruby:2.5.1-node-browsers
+    machine: true
     working_directory: ~/repo
     steps:
       - checkout
       - run: echo ${GOOGLE_AUTH} > ${HOME}/gcp-key.json
-      - run: sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
-      - run: sudo /opt/google-cloud-sdk/bin/gcloud container builds submit --config cloudbuild.yaml --substitutions=COMMIT_SHA=$CIRCLE_SHA1
-      - run: sudo /opt/google-cloud-sdk/bin/kubectl set image deployment ${IMAGE_NAME} ${IMAGE_NAME}=${IMAGE_NAME}:$CIRCLE_SHA1 --record
+      - run: gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
+      - run: gcloud container builds submit --config cloudbuild.yaml --substitutions=COMMIT_SHA=$CIRCLE_SHA1
+      - run: kubectl set image deployment ${IMAGE_NAME} ${IMAGE_NAME}=${IMAGE_NAME}:$CIRCLE_SHA1 --record
 
 workflows:
   version: 2
