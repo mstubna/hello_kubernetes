@@ -22,7 +22,7 @@ RUN bundle install --deployment && rbenv rehash
 ENV RACK_ENV=production \
     RAILS_ENV=production \
     RAILS_SERVE_STATIC_FILES=true \
-    SECRET_KEY_BASE=$SECRET_KEY_BASE
+    SECRET_KEY_BASE=88d24294e8de572f8526f0f0fcc51c0a857b58aee01182303c8bed8fae8646831a350f323e1d090c43055e6466275500006bc312ea0ab287cc0cb611619666fb
 
 # Install yarn
 RUN npm i -g yarn
