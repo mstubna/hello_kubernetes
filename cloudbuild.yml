@@ -1,0 +1,15 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'sh'
+  args:
+    - '-c'
+    - |
+      docker pull us.gcr.io/$PROJECT_ID/hello-kubernetes:latest || true
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--cache-from', 'us.gcr.io/$PROJECT_ID/hello-kubernetes:latest', '-t', 'us.gcr.io/$PROJECT_ID/hello-kubernetes:latest', '-t', 'us.gcr.io/$PROJECT_ID/hello-kubernetes:$COMMIT_SHA', '.' ]
+  env:
+    - 'RAILS_MASTER_KEY=590662e8366238c88f4cb45c213123cf'
+images:
+- 'us.gcr.io/$PROJECT_ID/hello-kubernetes:latest'
+- 'us.gcr.io/$PROJECT_ID/hello-kubernetes:$COMMIT_SHA'
+timeout: 3600s

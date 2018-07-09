@@ -1,0 +1,76 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: hello-kubernetes
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      run: hello-kubernetes
+  template:
+    metadata:
+      labels:
+        run: hello-kubernetes
+    spec:
+      containers:
+      - name: hello-kubernetes
+        image: us.gcr.io/${PROJECT_ID}/hello-kubernetes:${COMMIT_SHA}
+        imagePullPolicy: Always
+        ports:
+        - name: http-server
+          containerPort: 8080
+        env:
+        - name: FORMATION
+          value: web=1
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
+        - name: DB_HOST
+          value: localhost
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_DBNAME
+          value: "hello_kubernetes_production"
+        - name: RAILS_LOG_TO_STDOUT
+          value: "true"
+        - name: SECRET_KEY_BASE
+          value: "88d24294e8de572f8526f0f0fcc51c0a857b58aee01182303c8bed8fae8646831a350f323e1d090c43055e6466275500006bc312ea0ab287cc0cb611619666fb"
+        - name: PUMA_BIND
+          value: "tcp://localhost:8080"
+        - name: GOOGLE_CLOUD_KEYFILE_JSON
+          valueFrom:
+            secretKeyRef:
+              name: app-user-credentials
+              key: keyfile
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                  "-instances=${CONNECTION_NAME}=tcp:3306",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        volumeMounts:
+          - name: cloudsql-instance-credentials
+            mountPath: /secrets/cloudsql
+            readOnly: true
+          - name: cloudsql
+            mountPath: /cloudsql
+      volumes:
+      - name: cloudsql-instance-credentials
+        secret:
+          secretName: cloudsql-instance-credentials
+      - name: cloudsql
+        emptyDir:
+      - name: shared-assets
+        emptyDir: {}

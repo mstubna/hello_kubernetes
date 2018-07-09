@@ -80,6 +80,8 @@ test:
 #
 production:
   <<: *default
-  database: hello_kubernetes_production
-  username: hello_kubernetes
-  password: <%= ENV['HELLO_KUBERNETES_DATABASE_PASSWORD'] %>
+  host: <%= ENV["DB_HOST"] %>
+  port: <%= ENV["DB_PORT"] %>
+  username: <%= ENV["DB_USER"] %>
+  password: <%= ENV["DB_PASS"] %>
+  database: <%= ENV["DB_DBNAME"] %>
