@@ -4,10 +4,10 @@ steps:
   args:
     - '-c'
     - |
-      docker pull gcr.io/$PROJECT_ID/hello-kubernetes:latest || true
+      docker pull gcr.io/$GC_PROJECT/$GC_IMAGE:latest || true
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--cache-from', 'gcr.io/$PROJECT_ID/hello-kubernetes:latest', '-t', 'gcr.io/$PROJECT_ID/hello-kubernetes:latest', '-t', 'gcr.io/$PROJECT_ID/hello-kubernetes:$COMMIT_SHA', '.' ]
+  args: ['build', '--cache-from', 'gcr.io/$GC_PROJECT/$GC_IMAGE:latest', '-t', 'gcr.io/$GC_PROJECT/$GC_IMAGE:latest', '-t', 'gcr.io/$GC_PROJECT/$GC_IMAGE:$COMMIT_SHA', '.' ]
 images:
-- 'gcr.io/$PROJECT_ID/hello-kubernetes:latest'
-- 'gcr.io/$PROJECT_ID/hello-kubernetes:$COMMIT_SHA'
+- 'gcr.io/$GC_PROJECT/$GC_IMAGE:latest'
+- 'gcr.io/$GC_PROJECT/$GC_IMAGE:$COMMIT_SHA'
 timeout: 3600s
