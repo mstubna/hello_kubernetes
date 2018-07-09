@@ -76,15 +76,18 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: export COMMIT_SHA=$(git rev-parse --verify HEAD)
       - run: echo ${GOOGLE_AUTH} > ${HOME}/gcp-key.json
       - run: sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update kubectl
       - run: /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
       - run: /opt/google-cloud-sdk/bin/gcloud container builds submit --config cloudbuild.yaml --project=$GC_PROJECT --substitutions=_GC_IMAGE=$GC_IMAGE,COMMIT_SHA=$COMMIT_SHA .
+        environment:
+          - COMMIT_SHA=$(git rev-parse --verify HEAD)
       - run: /opt/google-cloud-sdk/bin/gcloud config set project $GC_PROJECT
       - run: /opt/google-cloud-sdk/bin/gcloud config set compute/zone $GC_ZONE
       - run: /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials $GC_CLUSTER
       - run: kubectl set image deployment hello-kubernetes hello-kubernetes=gcr.io/$GC_PROJECT/$GC_IMAGE:$COMMIT_SHA --record
+        environment:
+          - COMMIT_SHA=$(git rev-parse --verify HEAD)
 
 workflows:
   version: 2
