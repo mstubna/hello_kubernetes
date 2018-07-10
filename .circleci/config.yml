@@ -87,6 +87,9 @@ jobs:
             sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update kubectl
             sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
             /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
+            /opt/google-cloud-sdk/bin/gcloud config set project $GC_PROJECT
+            /opt/google-cloud-sdk/bin/gcloud config set compute/zone $GC_ZONE
+            /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials $GC_CLUSTER
             /opt/google-cloud-sdk/bin/gcloud container builds submit . --config cloudbuild.yaml --substitutions=COMMIT_SHA=$COMMIT_SHA --project=$GC_PROJECT
 
       - run:
@@ -94,8 +97,6 @@ jobs:
           command: |
             export COMMIT_SHA=$(git rev-parse --verify HEAD)
             export PROJECT_ID=$GC_PROJECT
-            /opt/google-cloud-sdk/bin/gcloud config set project $GC_PROJECT
-            /opt/google-cloud-sdk/bin/gcloud config set compute/zone $GC_ZONE
             export CONNECTION_NAME="$(gcloud sql instances describe hello-kubernetes --format=json | jq -r '.connectionName')"
             deploy/template.sh
             deploy/migrate.sh
@@ -104,10 +105,9 @@ jobs:
           name: deploy job
           command: |
             export COMMIT_SHA=$(git rev-parse --verify HEAD)
-            export CONNECTION_NAME="$(gcloud sql instances describe hello-kubernetes --format=json | jq -r '.connectionName')"
             export PROJECT_ID=$GC_PROJECT
+            export CONNECTION_NAME="$(gcloud sql instances describe hello-kubernetes --format=json | jq -r '.connectionName')"
             deploy/template.sh
-            /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials $GC_CLUSTER
             kubectl apply -f deploy/k8s/deploy-web.yml
 
 workflows:
