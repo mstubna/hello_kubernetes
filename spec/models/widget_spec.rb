@@ -4,6 +4,7 @@ RSpec.describe Widget, type: :model do
   describe 'schema' do
     describe 'columns' do
       it { is_expected.to have_db_column(:name).of_type(:string) }
+      it { is_expected.to have_db_column(:description).of_type(:string) }
     end
   end
 
