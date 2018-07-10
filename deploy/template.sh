@@ -23,5 +23,5 @@ do
   [[ $f =~ $DIR\/templates(.*) ]] && export OUTPUT_FILE="$DIR${BASH_REMATCH[1]}"
   mkdir -p $(dirname $OUTPUT_FILE)
   envsubst $SUB_VARS <$f >$OUTPUT_FILE
-  echo "$(realpath --relative-to="$PWD" "$OUTPUT_FILE")"
 done
+echo "files created!"

@@ -6,7 +6,7 @@ set -e
 kubectl delete job hello-kubernetes-db-migrate 2&> /dev/null || true
 
 # create the migration job
-kubectl apply -f deploy/k8s/jobs/job-migrate2.yml
+kubectl apply -f deploy/k8s/jobs/job-migrate.yml
 
 # monitor for completion of the migration job
 while [ true ]; do

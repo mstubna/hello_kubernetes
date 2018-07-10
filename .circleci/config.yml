@@ -93,8 +93,10 @@ jobs:
           name: migration job
           command: |
             export COMMIT_SHA=$(git rev-parse --verify HEAD)
-            export CONNECTION_NAME="$(gcloud sql instances describe hello-kubernetes --format=json | jq -r '.connectionName')"
             export PROJECT_ID=$GC_PROJECT
+            /opt/google-cloud-sdk/bin/gcloud config set project $GC_PROJECT
+            /opt/google-cloud-sdk/bin/gcloud config set compute/zone $GC_ZONE
+            export CONNECTION_NAME="$(gcloud sql instances describe hello-kubernetes --format=json | jq -r '.connectionName')"
             deploy/template.sh
             deploy/migrate.sh
 
@@ -104,10 +106,8 @@ jobs:
             export COMMIT_SHA=$(git rev-parse --verify HEAD)
             export CONNECTION_NAME="$(gcloud sql instances describe hello-kubernetes --format=json | jq -r '.connectionName')"
             export PROJECT_ID=$GC_PROJECT
-            /opt/google-cloud-sdk/bin/gcloud config set project $GC_PROJECT
-            /opt/google-cloud-sdk/bin/gcloud config set compute/zone $GC_ZONE
-            /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials $GC_CLUSTER
             deploy/template.sh
+            /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials $GC_CLUSTER
             kubectl apply -f deploy/k8s/deploy-web.yml
 
 workflows:
