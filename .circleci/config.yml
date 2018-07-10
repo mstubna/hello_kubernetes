@@ -80,23 +80,35 @@ jobs:
       - checkout
 
       - run:
-          name: submit build to Google Cloud Platform
+          name: build job
           command: |
             export COMMIT_SHA=$(git rev-parse --verify HEAD)
             echo ${GOOGLE_AUTH} > ${HOME}/gcp-key.json
             sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update kubectl
             sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
             /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
-            /opt/google-cloud-sdk/bin/gcloud container builds submit . --config cloudbuild.yaml --substitutions=_GC_IMAGE=$GC_IMAGE,COMMIT_SHA=$COMMIT_SHA --project=$GC_PROJECT
+            /opt/google-cloud-sdk/bin/gcloud container builds submit . --config cloudbuild.yaml --substitutions=COMMIT_SHA=$COMMIT_SHA --project=$GC_PROJECT
 
       - run:
-          name: trigger deploy
+          name: migration job
           command: |
             export COMMIT_SHA=$(git rev-parse --verify HEAD)
+            export CONNECTION_NAME="$(gcloud sql instances describe hello-kubernetes --format=json | jq -r '.connectionName')"
+            export PROJECT_ID=$GC_PROJECT
+            deploy/template.sh
+            deploy/migrate.sh
+
+      - run:
+          name: deploy job
+          command: |
+            export COMMIT_SHA=$(git rev-parse --verify HEAD)
+            export CONNECTION_NAME="$(gcloud sql instances describe hello-kubernetes --format=json | jq -r '.connectionName')"
+            export PROJECT_ID=$GC_PROJECT
             /opt/google-cloud-sdk/bin/gcloud config set project $GC_PROJECT
             /opt/google-cloud-sdk/bin/gcloud config set compute/zone $GC_ZONE
             /opt/google-cloud-sdk/bin/gcloud container clusters get-credentials $GC_CLUSTER
-            kubectl set image deployment hello-kubernetes hello-kubernetes=gcr.io/$GC_PROJECT/$GC_IMAGE:$COMMIT_SHA --record
+            deploy/template.sh
+            kubectl apply -f deploy/k8s/deploy-web.yml
 
 workflows:
   version: 2

@@ -1,8 +1,10 @@
 #!/bin/bash
 set -u
 
+# all variables
 SUB_VARS='$PROJECT_ID:$COMMIT_SHA:$CONNECTION_NAME:$EMAIL'
-# optional vars
+
+# optional variables default
 export EMAIL=${EMAIL:-"example@example.com"}
 
 # check required variables
